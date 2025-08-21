@@ -3,8 +3,11 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "당사모 Pretotype",
+  title: "당사모",
   description: "과장광고 판별 페이크도어 (알파 대기자 수집)",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

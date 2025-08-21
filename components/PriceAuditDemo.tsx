@@ -143,7 +143,7 @@ export default function PriceAuditDemo() {
           <button
             key={index}
             onClick={() => loadExample(example)}
-            className="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 transition-all duration-200 hover:scale-105"
+            className="px-3 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-700 bg-white transition-all duration-200 hover:scale-105"
           >
             {example.name}
           </button>
@@ -152,15 +152,11 @@ export default function PriceAuditDemo() {
 
       {/* 입력 폼 */}
       <div ref={formRef} className="card p-6">
-        <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">
-          가격 정보 입력
-        </h3>
+        <h3 className="text-lg font-semibold mb-4 text-slate-900">가격 정보 입력</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              원가 (KRW)
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">원가 (KRW)</label>
             <input
               type="number"
               value={formData.cost || ""}
@@ -171,9 +167,7 @@ export default function PriceAuditDemo() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              표시가 (KRW)
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">표시가 (KRW)</label>
             <input
               type="number"
               value={formData.listPrice || ""}
@@ -186,9 +180,7 @@ export default function PriceAuditDemo() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              판매가 (KRW)
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">판매가 (KRW)</label>
             <input
               type="number"
               value={formData.salePrice || ""}
@@ -201,9 +193,7 @@ export default function PriceAuditDemo() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              배송비 (KRW)
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">배송비 (KRW)</label>
             <input
               type="number"
               value={formData.shippingFee || ""}
