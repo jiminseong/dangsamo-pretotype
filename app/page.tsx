@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import Badge from "@/components/Badge";
+import PriceAuditDemo from "@/components/PriceAuditDemo";
 
 const METRIC_KEY = "ds_metrics_v1";
 
@@ -100,6 +101,9 @@ export default function Page() {
           </a>
           <a className="text-sm text-gray-600 hover:text-black" href="#features">
             기능
+          </a>
+          <a className="text-sm text-gray-600 hover:text-black" href="#price-audit">
+            가격감사
           </a>
           <a className="text-sm text-gray-600 hover:text-black" href="#how">
             동작방식
@@ -293,6 +297,16 @@ export default function Page() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* PRICE AUDIT */}
+      <section id="price-audit" className="mx-auto w-full max-w-6xl px-4 py-10">
+        <h2 className="text-xl font-bold mb-2">🔍 실시간 가격 감사</h2>
+        <p className="text-gray-600 mb-6">
+          원가 뻥튀기 후 할인 바이럴 패턴을 AI로 탐지합니다. 의심스러운 상품의 가격 정보를
+          입력해보세요.
+        </p>
+        <PriceAuditDemo />
       </section>
 
       {/* HOW */}
