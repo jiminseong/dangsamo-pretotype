@@ -52,7 +52,7 @@ export default function Footer() {
             <ul className="space-y-3 text-base text-gray-300">
               <li className="flex justify-between">
                 <p className="text-green-400">💡 피드백 및 아이디어 제안 :</p>
-                <p> prototype@dangsamo.kr</p>
+                <p> dangsamo.ai@gmail.com</p>
               </li>
               <li className="flex justify-between">
                 <p className="text-purple-400">🚀 정식 서비스 링크 : </p>
