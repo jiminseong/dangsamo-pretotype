@@ -1,10 +1,16 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Modal from "@/components/Modal";
 import Badge from "@/components/Badge";
 import PriceAuditDemo from "@/components/PriceAuditDemo";
 import ShareButton from "@/components/ShareButton";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const METRIC_KEY = "ds_metrics_v1";
 
@@ -47,6 +53,90 @@ export default function Page() {
   const [agree, setAgree] = useState(true);
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<"loading" | "gate" | "done">("loading");
+
+  // GSAP 애니메이션용 ref
+  const heroRef = useRef<HTMLDivElement>(null);
+  const exampleCardsRef = useRef<HTMLDivElement>(null);
+  const featureCardsRef = useRef<HTMLDivElement>(null);
+  const priceAuditRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // HERO 섹션 페이드업
+    if (heroRef.current) {
+      gsap.fromTo(
+        heroRef.current.children,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, stagger: 0.15, duration: 1, ease: "power2.out" }
+      );
+    }
+
+    // 예시 카드 스크롤 애니메이션
+    if (exampleCardsRef.current) {
+      gsap.fromTo(
+        exampleCardsRef.current.querySelectorAll("article"),
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.15,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: exampleCardsRef.current,
+            start: "top 80%",
+          },
+        }
+      );
+    }
+
+    // 기능 카드 스크롤 애니메이션
+    if (featureCardsRef.current) {
+      gsap.fromTo(
+        featureCardsRef.current.querySelectorAll(".card"),
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.2,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: featureCardsRef.current,
+            start: "top 80%",
+          },
+        }
+      );
+    }
+
+    // 가격 감사 섹션
+    if (priceAuditRef.current) {
+      gsap.fromTo(
+        priceAuditRef.current,
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: priceAuditRef.current,
+            start: "top 80%",
+          },
+        }
+      );
+    }
+
+    // 호버 애니메이션 향상
+    gsap.utils.toArray(".metric-card").forEach((card: any) => {
+      const tl = gsap.timeline({ paused: true });
+      tl.to(card, { scale: 1.05, duration: 0.3, ease: "power2.out" });
+
+      card.addEventListener("mouseenter", () => tl.play());
+      card.addEventListener("mouseleave", () => tl.reverse());
+    });
+  }, []);
 
   const utm = useMemo(() => {
     if (typeof window === "undefined") return {};
@@ -129,7 +219,7 @@ export default function Page() {
 
       {/* HERO SECTION */}
       <section className="section-padding bg-gray-50">
-        <div className="container-max text-center">
+        <div className="container-max text-center" ref={heroRef}>
           <div className="mb-12">
             <h1 className="heading-xl mb-8">
               이 상품,{" "}
@@ -240,7 +330,7 @@ export default function Page() {
 
       {/* 예시 섹션 */}
       <section id="examples" className="section-padding bg-white">
-        <div className="container-max">
+        <div className="container-max" ref={exampleCardsRef}>
           <div className="text-center mb-20">
             <h2 className="heading-lg mb-6">📋 실제 과장광고 사례</h2>
             <p className="text-body-lg text-gray-600">
@@ -333,7 +423,7 @@ export default function Page() {
 
       {/* 기능 섹션 */}
       <section id="features" className="section-padding bg-gray-50">
-        <div className="container-max">
+        <div className="container-max" ref={featureCardsRef}>
           <div className="text-center mb-20">
             <h2 className="heading-lg mb-6">🔍 무엇을 분석하나요?</h2>
             <p className="text-body-lg text-gray-600">AI가 다각도로 검증하는 항목들</p>
@@ -389,7 +479,7 @@ export default function Page() {
 
       {/* 가격 감사 섹션 */}
       <section id="price-audit" className="section-padding bg-white">
-        <div className="container-max">
+        <div className="container-max" ref={priceAuditRef}>
           <div className="text-center mb-16">
             <h2 className="heading-lg mb-6">💰 실시간 가격 감사</h2>
             <p className="text-body-lg text-gray-600 mb-12">

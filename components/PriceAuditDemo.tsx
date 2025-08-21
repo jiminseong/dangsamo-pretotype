@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import { PriceAuditInput, PriceAuditOutput } from "@/lib/priceAudit";
 import PriceAuditCard from "./PriceAuditCard";
 import Badge from "./Badge";
@@ -17,6 +18,29 @@ export default function PriceAuditDemo() {
     platformFeeRate: 0.1,
     taxRate: 0.1,
   });
+
+  const formRef = useRef<HTMLDivElement>(null);
+  const exampleButtonsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // 예시 버튼들 애니메이션
+    if (exampleButtonsRef.current) {
+      gsap.fromTo(
+        exampleButtonsRef.current.children,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, stagger: 0.1, duration: 0.5 }
+      );
+    }
+
+    // 폼 애니메이션
+    if (formRef.current) {
+      gsap.fromTo(
+        formRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, delay: 0.3 }
+      );
+    }
+  }, []);
 
   // 예시 데이터들
   const examples = [
@@ -100,17 +124,26 @@ export default function PriceAuditDemo() {
   const loadExample = (example: (typeof examples)[0]) => {
     setFormData(example.data);
     setResult(null);
+
+    // 버튼 클릭 시 애니메이션
+    if (formRef.current) {
+      gsap.fromTo(
+        formRef.current,
+        { scale: 1 },
+        { scale: 1.02, duration: 0.1, yoyo: true, repeat: 1 }
+      );
+    }
   };
 
   return (
     <div className="space-y-6">
       {/* 예시 버튼들 */}
-      <div className="flex gap-2 flex-wrap">
+      <div ref={exampleButtonsRef} className="flex gap-2 flex-wrap">
         {examples.map((example, index) => (
           <button
             key={index}
             onClick={() => loadExample(example)}
-            className="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900"
+            className="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 transition-all duration-200 hover:scale-105"
           >
             {example.name}
           </button>
@@ -118,7 +151,7 @@ export default function PriceAuditDemo() {
       </div>
 
       {/* 입력 폼 */}
-      <div className="card p-6">
+      <div ref={formRef} className="card p-6">
         <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">
           가격 정보 입력
         </h3>

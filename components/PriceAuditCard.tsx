@@ -1,3 +1,6 @@
+"use client";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import { PriceAuditOutput } from "@/lib/priceAudit";
 import Badge from "./Badge";
 
@@ -18,9 +21,28 @@ function getRiskLevel(score: number): {
 
 export default function PriceAuditCard({ result, currency = "KRW" }: PriceAuditCardProps) {
   const risk = getRiskLevel(result.score);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (cardRef.current) {
+      // 카드 전체 등장 애니메이션
+      gsap.fromTo(
+        cardRef.current,
+        { opacity: 0, y: 30, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }
+      );
+
+      // 내부 요소들 순차 애니메이션
+      gsap.fromTo(
+        cardRef.current.children,
+        { opacity: 0, x: -20 },
+        { opacity: 1, x: 0, stagger: 0.1, duration: 0.4, delay: 0.2 }
+      );
+    }
+  }, [result]);
 
   return (
-    <div className="card p-6">
+    <div ref={cardRef} className="card p-6">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">가격 감사 결과</h3>
