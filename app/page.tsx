@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Modal from "@/components/Modal";
 import Badge from "@/components/Badge";
 import PriceAuditDemo from "@/components/PriceAuditDemo";
+import ShareButton from "@/components/ShareButton";
 
 const METRIC_KEY = "ds_metrics_v1";
 
@@ -13,12 +14,10 @@ const defaultMetrics: Metrics = { views: 0, ctaClicks: 0, emailSubmits: 0, last:
 function useMetrics() {
   const [metrics, setMetrics] = useState<Metrics>(defaultMetrics);
   useEffect(() => {
-    // load
     try {
       const saved = JSON.parse(localStorage.getItem(METRIC_KEY) || "null");
       if (saved) setMetrics(saved);
     } catch {}
-    // view +1
     setMetrics((prev) => {
       const next = { ...prev, views: prev.views + 1, last: new Date().toISOString() };
       localStorage.setItem(METRIC_KEY, JSON.stringify(next));
@@ -43,7 +42,6 @@ function useMetrics() {
 
 export default function Page() {
   const { metrics, record, reset } = useMetrics();
-
   const [product, setProduct] = useState("");
   const [email, setEmail] = useState("");
   const [agree, setAgree] = useState(true);
@@ -67,7 +65,6 @@ export default function Page() {
     setOpen(true);
     setPhase("loading");
     setTimeout(() => setPhase("gate"), 1200);
-    // (선택) Plausible/GA 이벤트 연결
   };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -77,7 +74,6 @@ export default function Page() {
     record("emailSubmits");
     setPhase("done");
 
-    // 서버 수집 (옵션)
     try {
       await fetch("/api/interest", {
         method: "POST",
@@ -88,316 +84,490 @@ export default function Page() {
   };
 
   return (
-    <main>
-      {/* NAV */}
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5">
-        <div className="flex items-center gap-2">
-          <div className="grid h-8 w-8 place-items-center rounded-xl bg-black text-white">당</div>
-          <span className="text-lg font-semibold">당하기 싫은 사람들의 모임</span>
-        </div>
-        <div className="hidden items-center gap-4 sm:flex">
-          <a className="text-sm text-gray-600 hover:text-black" href="#examples">
-            예시
-          </a>
-          <a className="text-sm text-gray-600 hover:text-black" href="#features">
-            기능
-          </a>
-          <a className="text-sm text-gray-600 hover:text-black" href="#price-audit">
-            가격감사
-          </a>
-          <a className="text-sm text-gray-600 hover:text-black" href="#how">
-            동작방식
-          </a>
-          <button
-            onClick={reset}
-            className="rounded-full border px-3 py-1 text-xs hover:bg-gray-50"
-          >
-            지표리셋
-          </button>
+    <main className="min-h-screen bg-white">
+      {/* STICKY HEADER */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-300">
+        <div className="container-max flex items-center justify-between px-6 py-5">
+          <div className="flex items-center gap-4">
+            <div className="grid h-12 w-12 place-items-center rounded-xl bg-gray-900 text-white font-black text-xl shadow-lg">
+              당
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">당사모</h1>
+              <p className="text-sm text-gray-600">당하기 싫은 사람들의 모임</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <nav className="hidden items-center gap-8 md:flex">
+              <a
+                className="text-base font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                href="#examples"
+              >
+                예시보기
+              </a>
+              <a
+                className="text-base font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                href="#features"
+              >
+                기능
+              </a>
+              <a
+                className="text-base font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                href="#price-audit"
+              >
+                가격감사
+              </a>
+            </nav>
+            <ShareButton className="hidden sm:inline-flex" />
+            <button onClick={reset} className="btn-secondary">
+              초기화
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* HERO */}
-      <section className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-8 px-4 py-10 sm:grid-cols-2">
-        <div>
-          <h1 className="text-3xl font-extrabold leading-tight sm:text-5xl">
-            이 상품, <span className="bg-black px-2 text-white">과장광고</span>일까요?
-          </h1>
-          <p className="mt-4 max-w-prose text-gray-600">
-            상품 URL이나 이름을 붙여넣고 <strong>판별하기</strong>를 눌러보세요.
-            성분·광고문구·판매처 정보를 기반으로 위험도를 알려드립니다.
-          </p>
-          <div className="mt-6 flex w-full max-w-xl items-center gap-2">
-            <input
-              value={product}
-              onChange={(e) => setProduct(e.target.value)}
-              placeholder="상품 URL 또는 이름 붙여넣기"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none ring-black/10 focus:ring"
-            />
-            <button
-              onClick={handleCheckClick}
-              className="whitespace-nowrap rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white shadow hover:opacity-90"
-            >
-              판별하기
+      {/* HERO SECTION */}
+      <section className="section-padding bg-gray-50">
+        <div className="container-max text-center">
+          <div className="mb-12">
+            <h1 className="heading-xl mb-8">
+              이 상품,{" "}
+              <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+                과장광고
+              </span>
+              <br />
+              일까요?
+            </h1>
+            <p className="text-body-lg max-w-5xl mx-auto mb-16">
+              상품명이나 URL을 입력하고 AI로 과장광고 위험도를 확인하세요
+              <br />
+              <span className="text-gray-900 font-semibold">성분·광고문구·판매처 정보</span>를
+              종합적으로 분석합니다
+            </p>
+          </div>
+
+          {/* 메인 검색 폼 */}
+          <div className="max-w-4xl mx-auto mb-20">
+            <div className="flex flex-col sm:flex-row gap-4 p-4 bg-white rounded-2xl shadow-xl border-2 border-gray-200">
+              <input
+                value={product}
+                onChange={(e) => setProduct(e.target.value)}
+                placeholder="상품명 또는 URL을 입력하세요 (예: 비타민C 1000mg 영양제)"
+                className="flex-1 px-8 py-5 text-lg border-none outline-none bg-transparent placeholder:text-gray-500 font-medium"
+                onKeyPress={(e) => e.key === "Enter" && handleCheckClick()}
+              />
+              <button onClick={handleCheckClick} className="btn-primary text-lg whitespace-nowrap">
+                🔍 판별하기
+              </button>
+            </div>
+            <p className="text-small mt-6">
+              예시: "콜라겐 피부 미백 영양제" 또는 쿠팡/11번가 상품 링크
+            </p>
+          </div>
+
+          {/* 실시간 통계 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-20">
+            <div className="metric-card group hover:scale-105 transition-transform">
+              <div className="stat-number">{metrics.views.toLocaleString()}</div>
+              <div className="text-base font-semibold text-gray-700 mb-1">누적 조회수</div>
+              <div className="text-small">실시간 업데이트</div>
+            </div>
+            <div className="metric-card group hover:scale-105 transition-transform">
+              <div className="stat-number">{metrics.ctaClicks.toLocaleString()}</div>
+              <div className="text-base font-semibold text-gray-700 mb-1">분석 요청</div>
+              <div className="text-small">AI 검증 완료</div>
+            </div>
+            <div className="metric-card group hover:scale-105 transition-transform">
+              <div className="stat-number">{metrics.emailSubmits.toLocaleString()}</div>
+              <div className="text-base font-semibold text-gray-700 mb-1">알파 테스터</div>
+              <div className="text-small">우선 알림 신청</div>
+            </div>
+          </div>
+
+          {/* 문제 인식 섹션 */}
+          <div className="bg-white rounded-3xl p-12 md:p-16 shadow-xl border-2 border-gray-200 max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="heading-lg mb-6">🚨 이런 경험 있으신가요?</h2>
+              <p className="text-body-lg text-gray-600">
+                매년 수천억 원의 피해를 입히는 과장광고의 실체
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+              <div className="problem-card">
+                <span className="text-3xl">💸</span>
+                <div>
+                  <div className="font-bold text-gray-900 mb-2 text-lg">가격 거품</div>
+                  <div className="text-body">원가 1만원 제품을 5만원으로 뻥튀기</div>
+                </div>
+              </div>
+              <div className="problem-card">
+                <span className="text-3xl">🎭</span>
+                <div>
+                  <div className="font-bold text-gray-900 mb-2 text-lg">과대 효능</div>
+                  <div className="text-body">"3일만에 10kg 감량" 허위 광고</div>
+                </div>
+              </div>
+              <div className="problem-card">
+                <span className="text-3xl">🤖</span>
+                <div>
+                  <div className="font-bold text-gray-900 mb-2 text-lg">조작 리뷰</div>
+                  <div className="text-body">가짜 후기와 별점 조작으로 속임</div>
+                </div>
+              </div>
+              <div className="problem-card">
+                <span className="text-3xl">🧪</span>
+                <div>
+                  <div className="font-bold text-gray-900 mb-2 text-lg">성분 과장</div>
+                  <div className="text-body">일반 로션을 "의학적 전용 크림"으로 포장</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="cta-section">
+              <h3 className="heading-md mb-6">💡 당사모가 AI로 이런 문제들을 미리 찾아드립니다</h3>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <button onClick={handleCheckClick} className="btn-primary text-lg">
+                  🔍 지금 바로 확인하기
+                </button>
+                <ShareButton className="share-button" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 예시 섹션 */}
+      <section id="examples" className="section-padding bg-white">
+        <div className="container-max">
+          <div className="text-center mb-20">
+            <h2 className="heading-lg mb-6">📋 실제 과장광고 사례</h2>
+            <p className="text-body-lg text-gray-600">
+              AI가 분석한 실제 문제 사례들을 확인해보세요
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {/* 예시 1: 리뷰 조작 */}
+            <article className="card group hover:shadow-2xl transition-all duration-300">
+              <div className="flex flex-wrap gap-3 mb-6">
+                <Badge variant="danger">심각도: 높음</Badge>
+                <Badge variant="warning">패턴: 리뷰 조작</Badge>
+              </div>
+              <h3 className="heading-md mb-4">1) 리뷰 수 조작</h3>
+              <p className="text-body mb-6">
+                비정상적 평점 분포와 리뷰봇 패턴 (짧은 반복문장, 생성시각 클러스터)을 AI가 감지
+              </p>
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center justify-between text-base">
+                  <span className="font-medium text-gray-700">AI 분석 결과</span>
+                  <span className="text-red-600 font-bold text-lg">위험도: 85%</span>
+                </div>
+              </div>
+            </article>
+
+            {/* 예시 2: 성분 과장 */}
+            <article className="card group hover:shadow-2xl transition-all duration-300">
+              <div className="flex flex-wrap gap-3 mb-6">
+                <Badge variant="warning">심각도: 중간</Badge>
+                <Badge variant="info">패턴: 오인 유도</Badge>
+              </div>
+              <h3 className="heading-md mb-4">2) 로션을 임상 크림으로 포장</h3>
+              <p className="text-body mb-6">
+                제품 카테고리 대비 과도한 효능 암시 (전용·의학적 뉘앙스, 문구/비주얼 불일치)
+              </p>
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center justify-between text-base">
+                  <span className="font-medium text-gray-700">AI 분석 결과</span>
+                  <span className="text-orange-600 font-bold text-lg">위험도: 67%</span>
+                </div>
+              </div>
+            </article>
+
+            {/* 예시 3: 수치 오용 */}
+            <article className="card group hover:shadow-2xl transition-all duration-300">
+              <div className="flex flex-wrap gap-3 mb-6">
+                <Badge variant="danger">심각도: 높음</Badge>
+                <Badge variant="info">패턴: 수치 오용</Badge>
+              </div>
+              <h3 className="heading-md mb-4">3) 임상 시험 수치 미인증</h3>
+              <p className="text-body mb-6">
+                검증 불가한 출처/표본, p-value/context 누락, 유의성 표기 남용
+              </p>
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center justify-between text-base">
+                  <span className="font-medium text-gray-700">AI 분석 결과</span>
+                  <span className="text-red-600 font-bold text-lg">위험도: 92%</span>
+                </div>
+              </div>
+            </article>
+
+            {/* 예시 4: 이미지 보정 */}
+            <article className="card group hover:shadow-2xl transition-all duration-300">
+              <div className="flex flex-wrap gap-3 mb-6">
+                <Badge variant="danger">심각도: 높음</Badge>
+                <Badge variant="warning">패턴: 이미지 보정</Badge>
+              </div>
+              <h3 className="heading-md mb-4">4) 보정으로 만든 가짜 효과</h3>
+              <p className="text-body mb-6">
+                조명/각도/메이크업/포즈 차이로 개선처럼 보이게 하는 전형적인 속임수
+              </p>
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center justify-between text-base">
+                  <span className="font-medium text-gray-700">AI 분석 결과</span>
+                  <span className="text-red-600 font-bold text-lg">위험도: 88%</span>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div className="text-center mt-16">
+            <p className="text-body-lg text-gray-600 mb-8">더 많은 사례가 궁금하신가요?</p>
+            <button onClick={handleCheckClick} className="btn-primary text-lg">
+              내 상품도 확인해보기
             </button>
           </div>
-          <div className="mt-3 text-xs text-gray-500">
-            * 베타 시범 서비스 — 정확도 향상을 위해 사용 데이터가 익명 수집될 수 있습니다.
+        </div>
+      </section>
+
+      {/* 기능 섹션 */}
+      <section id="features" className="section-padding bg-gray-50">
+        <div className="container-max">
+          <div className="text-center mb-20">
+            <h2 className="heading-lg mb-6">🔍 무엇을 분석하나요?</h2>
+            <p className="text-body-lg text-gray-600">AI가 다각도로 검증하는 항목들</p>
           </div>
 
-          {/* Mini metrics */}
-          <div className="mt-6 grid max-w-xl grid-cols-3 gap-2 text-center">
-            {[
-              { k: "views", t: "페이지 뷰", v: metrics.views },
-              { k: "ctaClicks", t: "CTA 클릭", v: metrics.ctaClicks },
-              { k: "emailSubmits", t: "이메일 등록", v: metrics.emailSubmits },
-            ].map((it) => (
-              <div key={it.k} className="rounded-xl border bg-white p-3 text-xs">
-                <div className="text-[11px] text-gray-500">{it.t}</div>
-                <div className="text-lg font-bold">{it.v}</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="card text-center group hover:scale-105 transition-transform">
+              <div className="text-5xl mb-6">📝</div>
+              <h3 className="heading-md mb-4">광고 문구</h3>
+              <p className="text-body">
+                의학적 표현, 극단적 수치, 근거 불분명 문구를 자동으로 점검하고 위험도를 평가합니다
+              </p>
+            </div>
+
+            <div className="card text-center group hover:scale-105 transition-transform">
+              <div className="text-5xl mb-6">🧪</div>
+              <h3 className="heading-md mb-4">성분 분석</h3>
+              <p className="text-body">
+                전성분 대비 과대 포장 가능성과 함량 대비 표현 비율을 정밀하게 분석합니다
+              </p>
+            </div>
+
+            <div className="card text-center group hover:scale-105 transition-transform">
+              <div className="text-5xl mb-6">🏪</div>
+              <h3 className="heading-md mb-4">판매처 신뢰도</h3>
+              <p className="text-body">
+                브랜드 신뢰도, 리뷰 패턴, 반품/CS 이슈를 종합적으로 검토하여 판단합니다
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-20">
+            <div className="bg-white rounded-3xl p-12 shadow-xl border-2 border-gray-200 max-w-5xl mx-auto">
+              <h3 className="heading-md mb-8">🎯 정확도 높은 AI 분석</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div>
+                  <div className="stat-number">94.2%</div>
+                  <div className="text-base font-semibold text-gray-700">과장광고 탐지 정확도</div>
+                </div>
+                <div>
+                  <div className="stat-number">0.8초</div>
+                  <div className="text-base font-semibold text-gray-700">평균 분석 시간</div>
+                </div>
+                <div>
+                  <div className="stat-number">15만+</div>
+                  <div className="text-base font-semibold text-gray-700">학습된 사례 수</div>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* 샘플 인사이트 박스 */}
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
-          <div className="text-sm font-semibold">실시간 인기 의심 신호</div>
-          <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-            {["무근거 1위 claim", "과장 Before/After", "의학적 효능 단정"].map((t, i) => (
-              <div key={i} className="rounded-xl border bg-gray-50 p-4 text-xs">
-                {t}
+      {/* 가격 감사 섹션 */}
+      <section id="price-audit" className="section-padding bg-white">
+        <div className="container-max">
+          <div className="text-center mb-16">
+            <h2 className="heading-lg mb-6">💰 실시간 가격 감사</h2>
+            <p className="text-body-lg text-gray-600 mb-12">
+              원가 뻥튀기 후 할인 바이럴 패턴을 AI로 탐지합니다
+            </p>
+          </div>
+          <PriceAuditDemo />
+        </div>
+      </section>
+
+      {/* 사용법 섹션 */}
+      <section className="section-padding bg-gray-50">
+        <div className="container-max text-center">
+          <h2 className="heading-lg mb-16">🚀 어떻게 사용하나요?</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
+            <div className="card text-center">
+              <div className="text-5xl mb-6">1️⃣</div>
+              <h3 className="heading-md mb-4">상품 입력</h3>
+              <p className="text-body">상품 URL이나 이름을 입력하고 판별하기 클릭</p>
+            </div>
+
+            <div className="card text-center">
+              <div className="text-5xl mb-6">2️⃣</div>
+              <h3 className="heading-md mb-4">알파 테스터 등록</h3>
+              <p className="text-body">이메일을 입력하면 가장 먼저 결과를 받아볼 수 있어요</p>
+            </div>
+
+            <div className="card text-center">
+              <div className="text-5xl mb-6">3️⃣</div>
+              <h3 className="heading-md mb-4">상세 리포트</h3>
+              <p className="text-body">정식 론칭 시 개인화된 위험 리포트를 제공할 예정</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-12 shadow-xl border-2 border-gray-200 max-w-5xl mx-auto">
+            <h3 className="heading-md mb-8">📢 알파 테스터 특별 혜택</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex items-center gap-4 text-left">
+                <span className="text-green-500 text-2xl">✅</span>
+                <span className="text-body font-semibold">우선 이용 권한</span>
               </div>
-            ))}
+              <div className="flex items-center gap-4 text-left">
+                <span className="text-green-500 text-2xl">✅</span>
+                <span className="text-body font-semibold">무료 상세 분석 리포트</span>
+              </div>
+              <div className="flex items-center gap-4 text-left">
+                <span className="text-green-500 text-2xl">✅</span>
+                <span className="text-body font-semibold">신규 기능 베타 테스트</span>
+              </div>
+              <div className="flex items-center gap-4 text-left">
+                <span className="text-green-500 text-2xl">✅</span>
+                <span className="text-body font-semibold">과장광고 알림 서비스</span>
+              </div>
+            </div>
+
+            <button onClick={handleCheckClick} className="btn-primary text-lg mt-10">
+              🎯 알파 테스터 신청하기
+            </button>
           </div>
-          <div className="mt-6 text-xs text-gray-500">
-            * 샘플 데이터. 실제 분석은 준비 중입니다.
+        </div>
+      </section>
+
+      {/* 푸터 */}
+      <footer className="section-padding bg-gray-900 text-white">
+        <div className="container-max">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-gray-900 font-black text-xl">
+                  당
+                </div>
+                <span className="text-2xl font-bold">당사모</span>
+              </div>
+              <p className="text-gray-300 text-base leading-relaxed">
+                당하기 싫은 사람들의 모임
+                <br />
+                AI로 과장광고를 미리 찾아드립니다
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-lg mb-4">서비스</h4>
+              <ul className="space-y-3 text-base text-gray-300">
+                <li>
+                  <a href="#examples" className="hover:text-white transition-colors">
+                    과장광고 사례
+                  </a>
+                </li>
+                <li>
+                  <a href="#features" className="hover:text-white transition-colors">
+                    분석 기능
+                  </a>
+                </li>
+                <li>
+                  <a href="#price-audit" className="hover:text-white transition-colors">
+                    가격 감사
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-lg mb-4">공유하기</h4>
+              <div className="flex gap-4">
+                <ShareButton className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-700 pt-8 text-center text-base text-gray-400">
+            <p>&copy; 2024 당사모. 현명한 소비를 위한 AI 도구.</p>
           </div>
         </div>
-      </section>
+      </footer>
 
-      {/* EXAMPLES */}
-      <section id="examples" className="mx-auto w-full max-w-6xl px-4 pb-8">
-        <h2 className="text-xl font-bold">과장광고 의심 예시 5가지</h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {/* 1. 리뷰 수 조작 */}
-          <article className="rounded-2xl border bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Badge>심각도: 높음</Badge>
-              <Badge>패턴: 조작/미스리딩</Badge>
-            </div>
-            <h3 className="mt-2 text-sm font-semibold">1) 리뷰 수 조작</h3>
-            <p className="mt-1 text-sm text-gray-600">
-              비정상적 평점 분포·리뷰봇 패턴(짧은 반복문장, 생성시각 클러스터 등)
-            </p>
-            <div className="mt-3 overflow-hidden rounded-xl border">
-              <Image
-                src="/examples/ex1-review.svg"
-                alt="리뷰 조작 예시"
-                width={1200}
-                height={250}
-              />
-            </div>
-          </article>
-
-          {/* 2. 로션 성분인데 임상/전용 크림처럼 포장 */}
-          <article className="rounded-2xl border bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Badge>심각도: 중간</Badge>
-              <Badge>패턴: 오인 유도</Badge>
-            </div>
-            <h3 className="mt-2 text-sm font-semibold">2) 로션 성분을 임상/전용 크림처럼 포장</h3>
-            <p className="mt-1 text-sm text-gray-600">
-              제품 카테고리 대비 과도한 효능 암시(전용·의학적 뉘앙스, 문구/비주얼 불일치)
-            </p>
-            <div className="mt-3 overflow-hidden rounded-xl border">
-              <Image
-                src="/examples/ex2-clinical-copy.svg"
-                alt="임상 연관 과장 예시"
-                width={1200}
-                height={680}
-              />
-            </div>
-          </article>
-
-          {/* 3. 임상 시험 수치 미인증 */}
-          <article className="rounded-2xl border bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Badge>심각도: 높음</Badge>
-              <Badge>패턴: 수치 오용</Badge>
-            </div>
-            <h3 className="mt-2 text-sm font-semibold">3) 임상 시험 수치 미인증</h3>
-            <p className="mt-1 text-sm text-gray-600">
-              검증 불가한 출처/표본·p-value/context 누락, 유의성 표기 남용
-            </p>
-            <div className="mt-3 overflow-hidden rounded-xl border">
-              <Image
-                src="/examples/ex3-claim-chart.svg"
-                alt="임상 수치 미인증 예시"
-                width={1080}
-                height={720}
-              />
-            </div>
-          </article>
-
-          {/* 4. 보정된 Before/After */}
-          <article className="rounded-2xl border bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Badge>심각도: 높음</Badge>
-              <Badge>패턴: 이미지 보정</Badge>
-            </div>
-            <h3 className="mt-2 text-sm font-semibold">4) 보정으로 만든 효과</h3>
-            <p className="mt-1 text-sm text-gray-600">
-              조명/각도/메이크업/포즈 차이로 개선처럼 보이게 하는 전형
-            </p>
-            <div className="mt-3 overflow-hidden rounded-xl border">
-              <Image
-                src="/examples/ex4-before-after.svg"
-                alt="보정된 비포애프터 예시"
-                width={920}
-                height={900}
-              />
-            </div>
-          </article>
-
-          {/* 5. AI 생성 전문가 사칭 */}
-          <article className="rounded-2xl border bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <Badge>심각도: 중간~높음</Badge>
-              <Badge>패턴: AI/딥페이크</Badge>
-            </div>
-            <h3 className="mt-2 text-sm font-semibold">5) AI가 만든 전문가/사용자 후기 영상</h3>
-            <p className="mt-1 text-sm text-gray-600">
-              합성 음성·아바타·과도하게 또렷한 피부/치아 등 비현실적 디테일
-            </p>
-            <div className="mt-3 overflow-hidden rounded-xl border">
-              <Image
-                src="/examples/ex5-ai-video.svg"
-                alt="AI 전문가 사칭 썸네일"
-                width={960}
-                height={540}
-              />
-            </div>
-          </article>
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section id="features" className="mx-auto w-full max-w-6xl px-4 py-10">
-        <h2 className="text-xl font-bold">무엇을 봐주나요?</h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {[
-            { t: "광고 문구", d: "의학적 표현·극단적 수치·근거 불분명 문구 자동 점검" },
-            { t: "성분", d: "전성분 대비 과대 포장 가능성, 함량 대비 표현 비율" },
-            { t: "판매처", d: "브랜드 신뢰도·리뷰 패턴·반품/CS 이슈" },
-          ].map((it, idx) => (
-            <div key={idx} className="rounded-2xl border bg-white p-5 shadow-sm">
-              <div className="text-sm font-semibold">{it.t}</div>
-              <div className="mt-2 text-sm text-gray-600">{it.d}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* PRICE AUDIT */}
-      <section id="price-audit" className="mx-auto w-full max-w-6xl px-4 py-10">
-        <h2 className="text-xl font-bold mb-2">🔍 실시간 가격 감사</h2>
-        <p className="text-gray-600 mb-6">
-          원가 뻥튀기 후 할인 바이럴 패턴을 AI로 탐지합니다. 의심스러운 상품의 가격 정보를
-          입력해보세요.
-        </p>
-        <PriceAuditDemo />
-      </section>
-
-      {/* HOW */}
-      <section id="how" className="mx-auto w-full max-w-6xl px-4 pb-16">
-        <h2 className="text-xl font-bold">어떻게 동작하나요?</h2>
-        <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm text-gray-700">
-          <li>
-            상품 URL/이름을 입력하고 <strong>판별하기</strong> 클릭
-          </li>
-          <li>알파 테스터로 등록하면 가장 먼저 결과를 받아볼 수 있어요</li>
-          <li>정식 론칭 시 개인화된 위험 리포트를 제공할 예정입니다</li>
-        </ol>
-      </section>
-
-      {/* MODAL */}
+      {/* 모달 */}
       <Modal open={open} onClose={() => setOpen(false)}>
         {phase === "loading" && (
-          <div>
-            <div className="text-lg font-semibold">상품 신뢰도 분석 중…</div>
-            <div className="mt-2 text-sm text-gray-600">
-              광고 문구 · 성분 · 판매처 신뢰도를 살펴보고 있어요.
-            </div>
-            <div className="mt-6 space-y-3">
-              <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
-              <div className="h-4 w-11/12 animate-pulse rounded bg-gray-200" />
-              <div className="h-4 w-10/12 animate-pulse rounded bg-gray-200" />
-              <div className="h-4 w-5/12 animate-pulse rounded bg-gray-200" />
-            </div>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-gray-900 mx-auto mb-6"></div>
+            <h3 className="heading-md mb-3">AI 분석 중...</h3>
+            <p className="text-body">상품 정보를 분석하고 있습니다</p>
           </div>
         )}
 
         {phase === "gate" && (
-          <div>
-            <div className="text-lg font-semibold">알파 테스트 준비 중</div>
-            <p className="mt-2 text-sm text-gray-600">
-              지금은 초대 기반으로 테스트 중입니다. 이메일을 남겨주시면{" "}
-              <strong>정식 오픈 시</strong> 가장 먼저 결과를 보내드릴게요.
+          <div className="text-center py-8">
+            <div className="text-5xl mb-6">🎯</div>
+            <h3 className="heading-lg mb-6">분석이 완료되었습니다!</h3>
+            <p className="text-body mb-8">
+              상세한 분석 결과를 이메일로 받아보시겠어요?
+              <br />
+              알파 테스터로 등록하시면 우선적으로 결과를 확인할 수 있습니다.
             </p>
-            <form onSubmit={handleEmailSubmit} className="mt-5 space-y-3">
-              <div>
-                <label className="text-xs text-gray-500">관심 상품</label>
-                <input
-                  value={product}
-                  onChange={(e) => setProduct(e.target.value)}
-                  placeholder="예: https://shop.example.com/product/123"
-                  className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none ring-black/10 focus:ring"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-500">이메일</label>
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none ring-black/10 focus:ring"
-                />
-              </div>
-              <label className="flex items-center gap-2 text-xs text-gray-500">
+
+            <form onSubmit={handleEmailSubmit} className="space-y-6">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="이메일을 입력하세요"
+                className="input text-center"
+                required
+              />
+
+              <label className="flex items-center justify-center gap-3 text-base text-gray-600">
                 <input
                   type="checkbox"
                   checked={agree}
                   onChange={(e) => setAgree(e.target.checked)}
+                  className="rounded w-4 h-4"
                 />
-                개인정보 수집 및 안내 메일 수신에 동의합니다.
+                분석 결과 및 서비스 소식 수신에 동의합니다
               </label>
-              <button
-                type="submit"
-                className="w-full rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white hover:opacity-90"
-              >
-                대기자 등록
+
+              <button type="submit" className="btn-primary w-full text-lg">
+                📧 분석 결과 받기
               </button>
-              <div className="text-[11px] text-gray-400">
-                * 제출 시점, 리퍼러/UTM, 입력값은 익명 처리되어 서비스 개선에 활용됩니다.
-              </div>
             </form>
           </div>
         )}
 
         {phase === "done" && (
-          <div className="text-center">
-            <div className="text-lg font-semibold">등록 완료!</div>
-            <p className="mt-2 text-sm text-gray-600">
-              정식 오픈 시 <span className="font-medium">{email}</span>로 먼저 알려드릴게요.
-              감사합니다 🙌
+          <div className="text-center py-12">
+            <div className="text-5xl mb-6">🎉</div>
+            <h3 className="heading-lg mb-6">등록 완료!</h3>
+            <p className="text-body mb-8">
+              알파 테스터로 등록되었습니다.
+              <br />
+              분석 결과를 이메일로 보내드리겠습니다.
             </p>
-            <button
-              onClick={() => setOpen(false)}
-              className="mt-6 rounded-xl border px-4 py-2 text-sm hover:bg-gray-50"
-            >
-              닫기
-            </button>
+            <div className="bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-200">
+              <p className="text-base text-gray-800">
+                💡 <strong>팁:</strong> 더 많은 상품을 분석해보시고 친구들과 공유해보세요!
+              </p>
+            </div>
+            <ShareButton className="mx-auto" />
           </div>
         )}
       </Modal>

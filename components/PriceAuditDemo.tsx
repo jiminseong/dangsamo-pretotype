@@ -110,7 +110,7 @@ export default function PriceAuditDemo() {
           <button
             key={index}
             onClick={() => loadExample(example)}
-            className="px-3 py-2 text-sm border rounded-lg hover:bg-gray-50"
+            className="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900"
           >
             {example.name}
           </button>
@@ -118,66 +118,72 @@ export default function PriceAuditDemo() {
       </div>
 
       {/* 입력 폼 */}
-      <div className="rounded-2xl border bg-white p-6">
-        <h3 className="text-lg font-semibold mb-4">가격 정보 입력</h3>
+      <div className="card p-6">
+        <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">
+          가격 정보 입력
+        </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">원가 (KRW)</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              원가 (KRW)
+            </label>
             <input
               type="number"
               value={formData.cost || ""}
               onChange={(e) => setFormData((prev) => ({ ...prev, cost: Number(e.target.value) }))}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="input w-full"
               placeholder="12000"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">표시가 (KRW)</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              표시가 (KRW)
+            </label>
             <input
               type="number"
               value={formData.listPrice || ""}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, listPrice: Number(e.target.value) }))
               }
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="input w-full"
               placeholder="59000"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">판매가 (KRW)</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              판매가 (KRW)
+            </label>
             <input
               type="number"
               value={formData.salePrice || ""}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, salePrice: Number(e.target.value) }))
               }
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="input w-full"
               placeholder="19900"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">배송비 (KRW)</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              배송비 (KRW)
+            </label>
             <input
               type="number"
               value={formData.shippingFee || ""}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, shippingFee: Number(e.target.value) }))
               }
-              className="w-full border rounded-lg px-3 py-2 text-sm"
+              className="input w-full"
               placeholder="3000"
             />
           </div>
         </div>
 
-        <button
-          onClick={runAudit}
-          disabled={loading}
-          className="mt-4 w-full bg-black text-white py-3 rounded-xl font-semibold hover:opacity-90 disabled:opacity-50"
-        >
+        <button onClick={runAudit} disabled={loading} className="btn-primary mt-4 w-full">
           {loading ? "분석 중..." : "가격 감사 실행"}
         </button>
       </div>

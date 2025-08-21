@@ -1,7 +1,17 @@
-export default function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[11px] font-medium text-gray-700">
-      {children}
-    </span>
-  );
+export default function Badge({
+  children,
+  variant = "default",
+}: {
+  children: React.ReactNode;
+  variant?: "default" | "danger" | "warning" | "success" | "info";
+}) {
+  const variants = {
+    default: "badge badge-default",
+    danger: "badge badge-danger",
+    warning: "badge badge-warning",
+    success: "badge badge-success",
+    info: "badge badge-info",
+  };
+
+  return <span className={variants[variant]}>{children}</span>;
 }
