@@ -51,25 +51,18 @@ export default function Footer() {
             <h4 className="font-bold text-lg mb-4">🧪 프리토타입</h4>
             <ul className="space-y-3 text-base text-gray-300">
               <li className="flex justify-between">
-                <p className="text-sm text-gray-400 mb-2">서비스 공유</p>
-                <ShareButton className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600" />
-              </li>
-              <li className="flex justify-between">
-                <p className="text-blue-400">📧 피드백:</p>
-                <p> prototype@dangsamo.kr</p>
-              </li>
-              <li className="flex justify-between">
-                <p className="text-green-400">💡 아이디어 제안:</p>
+                <p className="text-green-400">💡 피드백 및 아이디어 제안:</p>
                 <p> prototype@dangsamo.kr</p>
               </li>
               <li className="flex justify-between">
                 <p className="text-purple-400">🚀 정식 서비스 준비 중: </p>
                 <p>정식 서비스 준비 중</p>
+              </li>{" "}
+              <li className="flex justify-between">
+                <p className="text-white"> 서비스 공유</p>
+                <ShareButton className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600" />
               </li>
             </ul>
-            <div className="space-y-4">
-              <div></div>
-            </div>
           </div>
         </div>
 
